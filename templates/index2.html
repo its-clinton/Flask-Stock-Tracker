@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Stock Tracker</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-7CjB0o3bYI1+EkStZsOO1gAkT3Jh9mZsT/RwF5VkEVRaBpEhlim0UbsvMVNO6NXd" crossorigin="anonymous">
+</head>
+
+<body>
+    <div class="container mt-5">
+        <h1>Stock Tracker</h1>
+        <form method="POST" action="{{ url_for('add_stock') }}">
+            <div class="form-group">
+                <label for="symbol">Enter a stock symbol to track:</label>
+                <input type="text" class="form-control" id="symbol" name="symbol">
+            </div>
+            <button type="submit" class="btn btn-primary">Add Symbol</button>
+        </form>
+        {% if symbols %}
+        <hr>
+        <h2>Tracked Symbols:</h2>
+        <ul class="list-group">
+            {% for symbol in symbols %}
+            <li class="list-group-item">{{ symbol }} <a href="{{ url_for('remove_symbol', symbol=symbol) }}" class="btn btn-danger btn-sm float-right">Remove</a></li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No symbols being tracked.</p>
+        {% endif %}
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBGMNjwK/6Zfkhvof+QhubYQpj9" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmIvmdlDmYw2gOEmBIf/" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+
+</html>

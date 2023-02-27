@@ -1,0 +1,30 @@
+.head1 {
+    text-align: center;
+}
+
+.formstyle {
+    margin: 0 auto;
+    width: 400px;
+    text-align: center;
+    height: 300px;
+}
+
+.placeholder {
+    border-radius: 10px;
+    color: white;
+}
+
+.navbar {
+    /* display: flex; */
+    /* justify-content: flex-end; */
+    /* background-color: #333; */
+    /* overflow: hidden; */
+}
+
+.navbar a {
+    color: #f2f2f2;
+    text-align: center;
+    float: right;
+    padding: 14px 16px;
+    text-decoration: none;
+}
