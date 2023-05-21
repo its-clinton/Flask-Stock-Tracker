@@ -7,7 +7,7 @@ from forms import RegistrationForm
 from forms import LoginForm
 import yfinance as yf
 import pandas as pd
-import plotly.graph_objs as go
+# import plotly.graph_objs as go
 from flask_login import login_required
 from io import BytesIO
 
@@ -150,7 +150,7 @@ def plot():
     df.index = pd.to_datetime(df.index)
     df['close'] = df['4. close'].astype(float)
     # Create plotly figure
-    fig = go.Figure()
+    # fig = go.Figure()
     fig.add_trace(go.Histogram(x=df['close'], nbinsx=20))
     fig.update_layout(title='IBM stock prices')
     # Convert plotly figure to HTML string
