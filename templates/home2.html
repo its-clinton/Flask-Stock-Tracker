@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Stock Tracker</title>
+    <link href="https://cdn.datatables.net/v/dt/dt-1.13.2/datatables.min.css" />
+    <link rel="stylesheet" href="/static/assets/css/home.css">
+    <script src="https://cdn.datatables.net/v/dt/dt-1.13.2/datatables.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#stock-table').DataTable();
+        });
+    </script>
+</head>
+
+<body>
+
+    <!-- navbar -->
+
+    <header>
+        <!-- <img src="https://codetheweb.blog/assets/img/icon2.png"> -->
+        <h1>Market Stock Tracker</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="/visualization">Data Visuals</a></li>
+                <li><a href="/logout">Log out</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- end navbar -->
+
+    <!-- main content -->
+
+    <main>
+        <div class="container">
+            <br>
+            <!-- <h1 style="color: dodgerblue;">Stock Tracker</h1> -->
+            <table id="stock-table">
+                <thead>
+                    <tr>
+                        <th>Stock Symbol</th>
+                        <th>Date Added</th>
+                        <th>Tracking Price</th>
+                        <th>Number of Shares</th>
+                        <th>Current Price</th>
+                        <th>% Change</th>
+                        <!-- <th>Remove</th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in api_data %}
+                    <tr>
+                        <td>{{ data.symbol }}</td>
+                        <td>{{ data.date }}</td>
+                        <td>{{ data.tracking_price }}</td>
+                        <td>{{ data.num_shares }}</td>
+                        <td>{{ data.current_price | round(2) }}</td>
+                        <td>{{ data.percent_change }}</td>
+
+                        <!-- <td><a href="" class="btn btn-danger">Remove</a></td> -->
+                        {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- end main content -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>

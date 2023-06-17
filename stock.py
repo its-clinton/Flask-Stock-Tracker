@@ -1,56 +1,81 @@
-from flask import Flask, render_template, request, redirect, url_for,session,flash
+from flask import Flask, render_template, request, redirect, url_for,session
 import requests
 import json
-import sqlite3
-from flask_wtf.csrf import CSRFProtect
-from forms import RegistrationForm
-from forms import LoginForm
 import yfinance as yf
 import pandas as pd
-# import plotly.graph_objs as go
-from flask_login import login_required
+import plotly.graph_objs as go
 from io import BytesIO
+from flask_admin import Admin
+from flask_admin.contrib.sqla import ModelView
+from flask_sqlalchemy import SQLAlchemy
 
+# create flask app
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+db = SQLAlchemy(app)
 
-# set up database
-conn = sqlite3.connect('stocktracker.db', check_same_thread=False)
-c = conn.cursor()
-        
-c.execute('''CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY,
-                username TEXT UNIQUE,
-                password TEXT
-            );''')
+app.app_context().push()
 
-c.execute('''CREATE TABLE IF NOT EXISTS stock_trackers (
-                id INTEGER PRIMARY KEY,
-                user_id INTEGER,
-                name TEXT,
-                symbol TEXT,
-                date_added TEXT,
-                tracking_price REAL,
-                num_shares INTEGER,
-                FOREIGN KEY (user_id) REFERENCES users (id)
-            );''')
-
-conn.commit()
-
-
-@app.route('/')
-def index():
-    return render_template('home.html')
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(100), unique=False, nullable=False)
 
     
+    def __repr__(self):
+        return '<User %r>' % self.email
+        
+# admin view
+admin = Admin(app)
+admin.add_view(ModelView(User, db.session))
+
 # home page
+@app.route('/', methods=['GET'])
+def index():
+    if session.get('logged_in'):
+        return redirect(url_for('home'))
+    else:
+        return render_template('auth/index.html', message="Welcome to Our Stock Market Tracker App")
+
+# register view
+@app.route('/register/', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        try:
+            db.session.add(User(email=request.form['email'], password=request.form['password']))
+            db.session.commit()
+            return redirect(url_for('login'))
+        except:
+            return render_template('auth/index.html', message="User Already Exists")
+    else:
+        return render_template('auth/register.html')
+
+# login view
+@app.route('/login/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return render_template('auth/login.html')
+    else:
+        e = request.form['email']
+        p = request.form['password']
+        data = User.query.filter_by(email=e, password=p).first()
+        if data is not None:
+            session['logged_in'] = True
+            return redirect(url_for('index'))
+        return render_template('auth/index.html', message="Incorrect Details")
+
+# logout view
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    session['logged_in'] = False
+    return redirect(url_for('index'))
+
+
+# main page
 @app.route('/home')
 def home():
-    # get all stocks from database
-    c.execute("SELECT * FROM stock_tracker")
-    rows = c.fetchall()
-    
-    #retrieve current stock prices from Alpha Vantage API
+   #retrieve current stock prices from Alpha Vantage API
     url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&apikey=5BF635F8CRSHGB3A'
 
     response = requests.get(url)
@@ -66,78 +91,9 @@ def home():
                 'percent_change': round((float(value['4. close']) - float(value['1. open'])) / float(value['1. open']) * 100, 2),
                                         } for key, value in api_data.items()]
  
-    # load stocks to be used in html
-    stocks = []
-    for row in rows:
-        stocks.append({
-            'id': row[0],
-            'symbol': row[1],
-            'tracking_price': row[2],
-            'num_shares': row[3]
-        })
 
-    return render_template('home.html', stocks=stocks, api_data=api_data)
-
-
-
-
-# add stock page
-@app.route('/add_stock', methods=['GET', 'POST'])
-def add_stock():
-    if request.method == 'POST':
-        # get form data
-        symbol = request.form['symbol']
-        tracking_price = float(request.form['tracking_price'])
-        num_shares = int(request.form['num_shares'])
-
-        # add stock to database
-        c.execute("INSERT INTO stock_tracker (stock_symbol, tracking_price, num_shares) VALUES (?, ?, ?)",
-                  (symbol, tracking_price, num_shares))
-        conn.commit()
-
-        # redirect to home page
-        return redirect(url_for('home'))
-
-    return render_template('add_stock.html')
-
-# remove stock
-@app.route('/remove_stock/<int:id>')
-def remove_stock(id):
-    # remove stock from database
-    c.execute("DELETE FROM stock_tracker WHERE id=?", (id,))
-    conn.commit()
-
-    # redirect to home page
-    return redirect(url_for('home'))
-
-app.secret_key = 'mysecretkey'
-        
-           
-@app.route('/register', methods=['POST', 'GET'])
-def register():
-    form =RegistrationForm()
-    if form.validate_on_submit():
-        # process form data
-        return redirect('/login')
-    return render_template('register.html', title='Register', form=form)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        # check if username and password are valid
-        username = form.username.data
-        password = form.password.data
-        # perform login logic here
-        return redirect(url_for('home'))
-    return render_template('login.html', form=form)
-
-#logout
-@app.route('/logout')
-def logout():
-    session.clear()  # clear all session data
-    return redirect(url_for('login'))
-
+    return render_template('home2.html',  api_data=api_data)
+   
 
 #visualization
 @app.route('/plot')
@@ -150,7 +106,7 @@ def plot():
     df.index = pd.to_datetime(df.index)
     df['close'] = df['4. close'].astype(float)
     # Create plotly figure
-    # fig = go.Figure()
+    fig = go.Figure()
     fig.add_trace(go.Histogram(x=df['close'], nbinsx=20))
     fig.update_layout(title='IBM stock prices')
     # Convert plotly figure to HTML string
@@ -175,9 +131,9 @@ def visualization():
     plot_div = fig.to_html(full_html=False)
     return render_template('visualization.html', plot_div=plot_div)
 
-
-
 # run the app
 if __name__ == '__main__':
+    app.secret_key = "ThisIsNotASecret:p"
+    db.create_all()
     app.run(debug=True)
     
