@@ -10,9 +10,17 @@
 
 <body>
 	<div class="form-box">
+		<!-- success -->
+		<div class="success-message">
+			{{ success }}
+		</div>
+
 		<form class="form" method="POST" action="/login">
 			<span class="title">Sign in</span>
 			<span class="subtitle">Log in to your account.</span>
+			<div class="error-message">
+				{{ error }}
+			</div>
 			<div class="form-container">
 				<input type="email" name="email" class="input" placeholder="Email">
 				<input type="password" name="password" class="input" placeholder="Password">
@@ -25,4 +33,5 @@
 	</div>
 
 </body>
+
 </html>

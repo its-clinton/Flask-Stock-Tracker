@@ -46,9 +46,9 @@ def register():
         try:
             db.session.add(User(email=request.form['email'], password=request.form['password']))
             db.session.commit()
-            return redirect(url_for('login'))
+            return render_template('auth/login.html', success="Registration Successful. Please Login.")
         except:
-            return render_template('auth/index.html', message="User Already Exists")
+            return render_template('auth/register.html', message="User Already Exists")
     else:
         return render_template('auth/register.html')
 
@@ -64,7 +64,7 @@ def login():
         if data is not None:
             session['logged_in'] = True
             return redirect(url_for('home'))
-        return render_template('auth/error.html', error="Incorrect Details")
+        return render_template('auth/login.html', error="Incorrect Details.Try Again")
 
 
 # home view
@@ -138,5 +138,6 @@ if __name__ == '__main__':
     db.create_all()
     app.run(debug=True)
     
+
 
     

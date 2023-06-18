@@ -93,3 +93,19 @@
     background-size: cover;
     background-repeat: no-repeat;
   }
+.error-message{
+  color: red;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+.success-message{
+  color: green;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+  /* background-color: green; */
+  /* width: 50%;
+  margin-left: 25%;
+  margin-top: 50px; */
+}

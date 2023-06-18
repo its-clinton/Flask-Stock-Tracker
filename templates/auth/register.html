@@ -14,6 +14,9 @@
 		<form class="form" method="POST" action="/register">
 			<span class="title">Sign up</span>
 			<span class="subtitle">Create an account.</span>
+			<div class="error-message">
+				{{ message }}
+			</div>
 			<div class="form-container">
 				<input type="email" class="input" name="email" placeholder="Email">
 				<input type="password" class="input" name="password" placeholder="Password">
