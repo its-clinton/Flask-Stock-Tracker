@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for,session
+from flask import Flask, render_template, request, redirect, url_for,session,Blueprint
 import requests
 import json
 import yfinance as yf
@@ -8,23 +8,38 @@ from io import BytesIO
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
+from flask_login import LoginManager, current_user
+from  flask_security import Security,UserMixin, RoleMixin, SQLAlchemyUserDatastore, login_required
+from flask_migrate import Migrate
 # create flask app
 
 app = Flask(__name__)
+app.secret_key = 'mysecret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 db = SQLAlchemy(app)
 
 app.app_context().push()
 
-class User(db.Model):
+# migrate
+migrate = Migrate(app, db)
+
+roles_users = db.Table('roles_users',
+                       db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
+                       db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
-    password = db.Column(db.String(100), unique=False, nullable=False)
-
+    password = db.Column(db.String(255), unique=False, nullable=False)
+    active = db.Column(db.Boolean, default=False)
+    roles = db.relationship('Role', secondary='roles_users', backref=db.backref('users', lazy='dynamic'))
     
     def __repr__(self):
         return '<User %r>' % self.email
+    
+class Role(db.Model, RoleMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True)
         
 # admin view
 admin = Admin(app)
