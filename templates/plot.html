@@ -5,10 +5,36 @@
     <meta charset="UTF-8">
     <title>Plot</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="/static/assets/css/home.css">
 </head>
 
 <body>
+    <header>
+        <!-- <img src="https://codetheweb.blog/assets/img/icon2.png"> -->
+        <h1>Market Stock Tracker</h1>
+        <nav>
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="#">About</a></li>
+                <li><a href="/visualization">Data Visuals</a></li>
+                <li><a href="/logout">Log out</a></li>
+            </ul>
+        </nav>
+    </header>
+
+            <h1 style="text-align: center;">
+                Histogram of the IBM Stock Prices
+            </h1>
+
     <div id="plotlyChart">{{ plot_html|safe }}</div>
+    <div class="button-container">
+        <!-- <a href="{{ url_for('plot') }}">
+            <button class="button">View More</button>
+        </a> -->
+            <a href="/home">
+            <button class="button">Back to Home</button>
+            </a>
+    </div>
 </body>
 
 </html>

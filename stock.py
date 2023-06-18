@@ -8,7 +8,7 @@ from io import BytesIO
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
-
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 # create flask app
 
 app = Flask(__name__)
@@ -30,13 +30,21 @@ class User(db.Model):
 admin = Admin(app)
 admin.add_view(ModelView(User, db.session))
 
-# home page
+# login manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
+
 @app.route('/', methods=['GET'])
 def index():
     if session.get('logged_in'):
-        return redirect(url_for('home'))
+        return render_template('auth/index.html')
     else:
-        return render_template('auth/index.html', message="Welcome to Our Stock Market Tracker App")
+        return render_template('home2.html')
 
 # register view
 @app.route('/register/', methods=['GET', 'POST'])
@@ -62,14 +70,8 @@ def login():
         data = User.query.filter_by(email=e, password=p).first()
         if data is not None:
             session['logged_in'] = True
-            return redirect(url_for('index'))
-        return render_template('auth/index.html', message="Incorrect Details")
-
-# logout view
-@app.route('/logout', methods=['GET', 'POST'])
-def logout():
-    session['logged_in'] = False
-    return redirect(url_for('index'))
+            return redirect(url_for('home'))
+        return render_template('auth/error.html', error="Incorrect Details")
 
 
 # main page
@@ -93,7 +95,7 @@ def home():
  
 
     return render_template('home2.html',  api_data=api_data)
-   
+
 
 #visualization
 @app.route('/plot')
@@ -130,6 +132,12 @@ def visualization():
     fig = go.Figure(data=[trace], layout=layout)
     plot_div = fig.to_html(full_html=False)
     return render_template('visualization.html', plot_div=plot_div)
+
+# logout view
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    session['logged_in'] = False
+    return render_template('auth/index.html')
 
 # run the app
 if __name__ == '__main__':

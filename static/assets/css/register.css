@@ -1,14 +1,15 @@
 .form-box {
     max-width: 400px;
-    background: #f1f7fe;
+    /* background: #f1f7fe; */
     overflow: hidden;
     border-radius: 16px;
-    color: #010101;
+    color: white;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     margin: 0 auto;
     margin-top: 100px;
+    font-weight: bold;
   }
   
   .form {
@@ -28,14 +29,14 @@
   
   .subtitle {
     font-size: 1rem;
-    color: #666;
+    color: white;
   }
   
   /*Inputs box*/
   .form-container {
     overflow: hidden;
     border-radius: 8px;
-    background-color: #fff;
+    /* background-color: #fff; */
     margin: 1rem 0 .5rem;
     width: 100%;
   }
@@ -49,12 +50,13 @@
     border-bottom: 1px solid #eee;
     font-size: .9rem;
     padding: 8px 15px;
+    color: white;
   }
   
   .form-section {
     padding: 16px;
     font-size: .85rem;
-    background-color: #e0ecfb;
+    /* background-color: #e0ecfb; */
     box-shadow: rgb(0 0 0 / 8%) 0 -1px;
     text-align: center;
   }
@@ -85,4 +87,9 @@
   
   .form button:hover {
     background-color: #005ce6;
+  }
+  body{
+    background-image: url('/static/assets/images/image2.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
   }
