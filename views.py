@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for,session,Blueprint
+from stock import app
+from flask import render_template, request, redirect, url_for, session,Blueprint
 import requests
 import json
 import yfinance as yf
@@ -6,11 +7,14 @@ import pandas as pd
 import plotly.graph_objs as go
 from io import BytesIO
 from flask_login import LoginManager
+from models import *
 from flask_migrate import Migrate
-from models import db, User
 
-# create flask app
-app = Flask(__name__)
+
+
+# using a blueprint
+my_views = Blueprint('my_views', __name__)
+
 app.secret_key = 'mysecret'
 
 # configure database
@@ -31,7 +35,8 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(user_id)
 
-# root view
+
+
 @app.route('/', methods=['GET'])
 def index():
     if session.get('logged_in'):
@@ -67,9 +72,10 @@ def login():
         return render_template('auth/error.html', error="Incorrect Details")
 
 
-# home view
+# main page
 @app.route('/home')
 def home():
+   #retrieve current stock prices from Alpha Vantage API
     url = f'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&apikey=5BF635F8CRSHGB3A'
 
     response = requests.get(url)
@@ -89,7 +95,7 @@ def home():
     return render_template('home2.html',  api_data=api_data)
 
 
-# plot view
+#visualization
 @app.route('/plot')
 def plot():
     # Fetch stock data
@@ -108,7 +114,6 @@ def plot():
     # Render HTML template with plotly figure
     return render_template('plot.html', plot_html=plot_html)
 
-# visualization view
 @app.route('/visualization')
 def visualization():
     url = 'https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=IBM&interval=5min&apikey=5BF635F8CRSHGB3A'
@@ -132,11 +137,3 @@ def logout():
     session['logged_in'] = False
     return render_template('auth/index.html')
 
-# run the app
-if __name__ == '__main__':
-    app.secret_key = "ThisIsNotASecret:p"
-    db.create_all()
-    app.run(debug=True)
-    
-
-    
